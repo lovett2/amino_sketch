@@ -3,38 +3,25 @@ import http.requests.*;
 int bucketNumber = 0;
 int bucketCol = 0;
 int bucketRow = 0;
-
-int counter = 0;
 int[] bucketAddress = new int[55];
 
-//variables used by sendGet function
+//variables used by setBucketColor function
 String common = "http://192.168.16.";
 String tempURL;
 String URL;
 int bucketUniqueAddress;
 
-int sendCounter = 0;
-
-String[] program = {"ocean", "vapor", "spinner", "rainbow", "bonfire", "ctrlh", "text", "circle", "tron"};
-char[] aminoDict = {'a', 'b', 'c'};
-char[] aminoAcid = {'a', 'b', 'c', 'b', 'c', 'c'};
+//variables involving amino acid sequence
+HashMap<String, Integer> aminoColors = new HashMap<String, Integer>();
+String adenosineReceptor = "GSSVYITVELAIAVLAILGNVLVCWAVWLNSNLQNVTNYFVVSLAAADIAVGVLAIPFAITISTGFCAACHGCLFIACFVLVLTQSSIFSLLAIAIDRYIAIRIPLRYNGLVTGTRAKGIIAICWVLSFAIGLTPMLGWNNCGQPKEGKNHSQGCGEGQVACLFEDVVPMNYMVYFNFFACVLVPLLLMLGVYLRIFLAARRQLKQMESQPLPGERARSTLQKEVHAAKSLAIIVGLFALCWLPLHIINCFTFFCPDCSHAPLWLMYLAIVLSHTNSVVNPFIYAYRIREFRQTFRKIIRSHVLRQQEPFKAAGTSARVLAAHGSDGEQVSLRLNGHPPGVWANGSAPHPERRPNGYALGLVSGGSAQESQGNTGLPDVELLSHELKGVCPEPPGLDDPLAQDGAGVSMGSSVYITVELAIAVLAILGNVLVCWAVWLNSNLQNVTNYFVVSLAAADIAVGVLAIPFAITISTGFCAACHGCLFIACFVLVLTQSSIFSLLAIAIDRYIAIRIPLRYNGLVTGTRAKGIIAICWVLSFAIGLTPMLGWNNCGQPKEGKNHSQGCGEGQVACLFEDVVPMNYMVYFNFFACVLVPLLLMLGVYLRIFLAARRQLKQMESQPLPGERARSTLQKEVHAAKSLAIIVGLFALCWLPLHIINCFTFFCPDCSHAPLWLMYLAIVLSHTNSVVNPFIYAYRIREFRQTFRKIIRSHVLRQQEPFKAAGTSARVLAAHGSDGEQVSLRLNGHPPGVWANGSAPHPERRPNGYALGLVSGGSAQESQGNTGLPDVELLSHELKGVCPEPPGLDDPLAQDGAGVS";
 int aminoCounter = 0;
-char currentChar = aminoAcid[aminoCounter];
+char currentChar;
 
-int waitTime = 500;
-int lastTime = 0;
+HashMap<String, Integer> elementColors = new HashMap<String, Integer>();
 
-int increment = 0;
-
-int colors = 10;
-int colorRed = 0;
-int colorGreen = 0;
-int colorBlue = 0;
-int colorJ = 0;
-int wheelPos = 0;
+color bucketColor;
 
 void setup() {
-  //size(512, 424);
   smooth();
   
   int j = 201;
@@ -43,91 +30,62 @@ void setup() {
     j++;
   }
   
-  for(int i = 0; i < 21; i++){
-     
-  }
+  aminoColors.put("G", #A93226);
+  aminoColors.put("A", #CB4335);
+  aminoColors.put("L", #884EA0);
+  aminoColors.put("M", #7D3C98);
+  aminoColors.put("F", #2471A3);
+  aminoColors.put("W", #2E86C1);
+  aminoColors.put("K", #17A589);
+  aminoColors.put("Q", #138D75);
+  aminoColors.put("E", #229954);
+  aminoColors.put("S", #28B463);
+  aminoColors.put("P", #D4AC0D);
+  aminoColors.put("V", #D68910);
+  aminoColors.put("I", #CA6F1E);
+  aminoColors.put("C", #BA4A00);
+  aminoColors.put("Y", #641E16);
+  aminoColors.put("H", #78281F);
+  aminoColors.put("R", #512E5F);
+  aminoColors.put("N", #4A235A);
+  aminoColors.put("D", #154360);
+  aminoColors.put("T", #1B4F72);
+  aminoColors.put("U", #0E6251);
 }
 
 void draw() {
- 
-  background(0);
-
-  if(sendCounter < 1){ //send x amount of times 
-    //println(colors);
-    currentChar = aminoAcid[aminoCounter];
-    bucketNumber = bucketCol + bucketRow;
     
-    sendGet(bucketNumber, colorRed, colorGreen, colorBlue, program[increment]);
+  currentChar = adenosineReceptor.charAt(aminoCounter);
+  bucketColor = aminoColors.get(str(currentChar));
     
-    delay(15);
-    println("Bucket number :" + bucketNumber);
-    bucketCol += 10;
-    if(bucketCol == 50){  //completed sending to all 50 buckets
-      sendCounter = 0;
-      //if(sendCounter < 5){ //sendcounter goes to 5 and we stop sending
-      //  sendCounter++;
-      //}
-      bucketCol = 0;
-      bucketRow++;
-      if(bucketRow == 10){
-        bucketRow = 0;
-        aminoCounter++;
-      }
-    }
-    if(aminoCounter == aminoAcid.length){
-      aminoCounter = 0;
-    }
-  }
-  else{
-    //println("finished sending");
-  }
+  setBucketColor(bucketRow, bucketCol, bucketColor);
   
-  switch(currentChar){
-    case 'a':
-      colorRed = 255;
-      colorGreen = 0;
-      colorBlue = 0;
-      break;
-     case 'b':
-       colorRed = 0;
-       colorGreen = 255;
-       colorBlue = 0;
-       break;
-      case 'c':
-        colorRed = 0;
-        colorGreen = 0;
-        colorBlue = 255;
-        break;
-  }
-
-  if(millis() - lastTime > waitTime){  //change program every 12 seconds... reset send counter
-    increment++;   //goes t next program
-    //sendCounter = 0;  //restarts sending to buckets
-    lastTime = millis();
-    if(increment == 9){
-      increment = 0;
+  delay(15);
+  println("Bucket number :" + bucketNumber);
+  bucketRow++;
+  if(bucketRow == 5){  //completed sending to all 50 buckets
+    bucketRow = 0;
+    bucketCol++;
+    if(bucketCol == 10){
+      bucketCol = 0;
+      aminoCounter++;
     }
   }
-}
-
-class amino{
-  int red, green, blue;
-  char chr;
-  amino(int r, int g, int b, char c){
-    red = r;
-    green = g;
-    blue = b;
-    chr = c;
+  if(aminoCounter == adenosineReceptor.length()){
+    aminoCounter = 0;
+    //exit();
   }
 }
 
   //send get post
-void sendGet(int bucketPos, int red, int green, int blue, String currentProgram){ 
-  bucketUniqueAddress = bucketAddress[bucketPos];
+void setBucketColor(int bucketRow, int bucketCol, color bucketColor){
+  fill(bucketColor);
+  rect(bucketCol * 10, bucketRow * 10, 10, 10);
   
-  //String URL = common + bucketUniqueAddress + "/?" + "sequence=" + currentProgram;
-  
-  URL = common + bucketUniqueAddress + "/?" + "r=" + red + "&g=" + green + "&b=" + blue; 
+  bucketNumber = bucketCol + (bucketRow * 10);
+  bucketUniqueAddress = bucketAddress[bucketNumber];
+    
+  URL = common + bucketUniqueAddress + "/?" + "r=" + red(bucketColor) + "&g=" + green(bucketColor) + "&b=" + blue(bucketColor); 
   
   println(URL);
   
