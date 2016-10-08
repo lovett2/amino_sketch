@@ -7,7 +7,11 @@ int bucketRow = 0;
 int counter = 0;
 int[] bucketAddress = new int[55];
 
+//variables used by sendGet function
+String common = "http://192.168.16.";
 String tempURL;
+String URL;
+int bucketUniqueAddress;
 
 int sendCounter = 0;
 
@@ -38,6 +42,10 @@ void setup() {
     bucketAddress[i] = j;
     j++;
   }
+  
+  for(int i = 0; i < 21; i++){
+     
+  }
 }
 
 void draw() {
@@ -46,8 +54,11 @@ void draw() {
 
   if(sendCounter < 1){ //send x amount of times 
     //println(colors);
+    currentChar = aminoAcid[aminoCounter];
     bucketNumber = bucketCol + bucketRow;
+    
     sendGet(bucketNumber, colorRed, colorGreen, colorBlue, program[increment]);
+    
     delay(15);
     println("Bucket number :" + bucketNumber);
     bucketCol += 10;
@@ -60,33 +71,12 @@ void draw() {
       bucketRow++;
       if(bucketRow == 10){
         bucketRow = 0;
+        aminoCounter++;
       }
     }
-    
-    wheelPos = 255 - ((colorJ+bucketNumber) & 255);
-    
-    if(wheelPos < 85) {
-      colorRed = 255 - wheelPos * 3;
-      colorGreen = 0;
-      colorBlue = wheelPos * 3;
+    if(aminoCounter == aminoAcid.length){
+      aminoCounter = 0;
     }
-    if(wheelPos > 85 && wheelPos < 170) {
-      wheelPos -= 85;
-      colorRed = 0;
-      colorGreen = wheelPos * 3;
-      colorBlue = 255 - wheelPos * 3;
-    }
-    if(wheelPos > 170){
-      wheelPos -= 170;
-      colorRed = wheelPos * 3;
-      colorGreen = 255 - wheelPos * 3;
-      colorBlue = 0;
-    }
-    colorJ++;
-    if(colorJ > 255){
-      colorJ = 0;
-    }
-    
   }
   else{
     //println("finished sending");
@@ -94,55 +84,50 @@ void draw() {
   
   switch(currentChar){
     case 'a':
-      redColor = 255;
-      greenColor = 0;
-      blueColor = 0;
+      colorRed = 255;
+      colorGreen = 0;
+      colorBlue = 0;
       break;
      case 'b':
-       redColor = 0;
-       greenColor = 255;
-       blueColor = 0;
+       colorRed = 0;
+       colorGreen = 255;
+       colorBlue = 0;
        break;
       case 'c':
-        redColor = 0;
-        greenColor = 0;
-        blueColor = 255;
+        colorRed = 0;
+        colorGreen = 0;
+        colorBlue = 255;
         break;
   }
 
-if(millis() - lastTime > waitTime){  //change program every 12 seconds... reset send counter
-  increment++;   //goes t next program
-  //sendCounter = 0;  //restarts sending to buckets
-  lastTime = millis();
-  if(increment == 9){
-    increment = 0;
+  if(millis() - lastTime > waitTime){  //change program every 12 seconds... reset send counter
+    increment++;   //goes t next program
+    //sendCounter = 0;  //restarts sending to buckets
+    lastTime = millis();
+    if(increment == 9){
+      increment = 0;
+    }
   }
 }
 
-}
-
-class amino {
-  
+class amino{
+  int red, green, blue;
+  char chr;
+  amino(int r, int g, int b, char c){
+    red = r;
+    green = g;
+    blue = b;
+    chr = c;
+  }
 }
 
   //send get post
-void sendGet(int bucketPos, int red, int green, int blue, String currentProgram){
- 
- //for(int j=201; j<251; j++){  //add addresses to all the buckets
-  //int j = 201;
-  //for(int i=0; i<51; i++){
-    //bucketAddress[i] = j;
-    //j++;
-  //}
-//}
-  
-  
-  String common = "http://192.168.16."; // answer text
-  int bucketUniqueAddress = bucketAddress[bucketPos];
+void sendGet(int bucketPos, int red, int green, int blue, String currentProgram){ 
+  bucketUniqueAddress = bucketAddress[bucketPos];
   
   //String URL = common + bucketUniqueAddress + "/?" + "sequence=" + currentProgram;
   
-  String URL = common + bucketUniqueAddress + "/?" + "r=" + red + "&g=" + green + "&b=" + blue; 
+  URL = common + bucketUniqueAddress + "/?" + "r=" + red + "&g=" + green + "&b=" + blue; 
   
   println(URL);
   
@@ -154,6 +139,7 @@ void sendGetRequest(){
   try {
     GetRequest get = new GetRequest(tempURL);
     get.send();
+    get = null;
   } catch (Exception err) {
     // don't care lol
   }
