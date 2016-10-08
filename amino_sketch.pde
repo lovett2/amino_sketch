@@ -13,11 +13,12 @@ int bucketUniqueAddress;
 
 //variables involving amino acid sequence
 HashMap<String, Integer> aminoColors = new HashMap<String, Integer>();
-String adenosineReceptor = "GSSVYITVELAIAVLAILGNVLVCWAVWLNSNLQNVTNYFVVSLAAADIAVGVLAIPFAITISTGFCAACHGCLFIACFVLVLTQSSIFSLLAIAIDRYIAIRIPLRYNGLVTGTRAKGIIAICWVLSFAIGLTPMLGWNNCGQPKEGKNHSQGCGEGQVACLFEDVVPMNYMVYFNFFACVLVPLLLMLGVYLRIFLAARRQLKQMESQPLPGERARSTLQKEVHAAKSLAIIVGLFALCWLPLHIINCFTFFCPDCSHAPLWLMYLAIVLSHTNSVVNPFIYAYRIREFRQTFRKIIRSHVLRQQEPFKAAGTSARVLAAHGSDGEQVSLRLNGHPPGVWANGSAPHPERRPNGYALGLVSGGSAQESQGNTGLPDVELLSHELKGVCPEPPGLDDPLAQDGAGVSMGSSVYITVELAIAVLAILGNVLVCWAVWLNSNLQNVTNYFVVSLAAADIAVGVLAIPFAITISTGFCAACHGCLFIACFVLVLTQSSIFSLLAIAIDRYIAIRIPLRYNGLVTGTRAKGIIAICWVLSFAIGLTPMLGWNNCGQPKEGKNHSQGCGEGQVACLFEDVVPMNYMVYFNFFACVLVPLLLMLGVYLRIFLAARRQLKQMESQPLPGERARSTLQKEVHAAKSLAIIVGLFALCWLPLHIINCFTFFCPDCSHAPLWLMYLAIVLSHTNSVVNPFIYAYRIREFRQTFRKIIRSHVLRQQEPFKAAGTSARVLAAHGSDGEQVSLRLNGHPPGVWANGSAPHPERRPNGYALGLVSGGSAQESQGNTGLPDVELLSHELKGVCPEPPGLDDPLAQDGAGVS";
+String adenosineReceptor = "00000000000000000000000000000000000000000000000000GSSVYITVELAIAVLAILGNVLVCWAVWLNSNLQNVTNYFVVSLAAADIAVGVLAIPFAITISTGFCAACHGCLFIACFVLVLTQSSIFSLLAIAIDRYIAIRIPLRYNGLVTGTRAKGIIAICWVLSFAIGLTPMLGWNNCGQPKEGKNHSQGCGEGQVACLFEDVVPMNYMVYFNFFACVLVPLLLMLGVYLRIFLAARRQLKQMESQPLPGERARSTLQKEVHAAKSLAIIVGLFALCWLPLHIINCFTFFCPDCSHAPLWLMYLAIVLSHTNSVVNPFIYAYRIREFRQTFRKIIRSHVLRQQEPFKAAGTSARVLAAHGSDGEQVSLRLNGHPPGVWANGSAPHPERRPNGYALGLVSGGSAQESQGNTGLPDVELLSHELKGVCPEPPGLDDPLAQDGAGVSMGSSVYITVELAIAVLAILGNVLVCWAVWLNSNLQNVTNYFVVSLAAADIAVGVLAIPFAITISTGFCAACHGCLFIACFVLVLTQSSIFSLLAIAIDRYIAIRIPLRYNGLVTGTRAKGIIAICWVLSFAIGLTPMLGWNNCGQPKEGKNHSQGCGEGQVACLFEDVVPMNYMVYFNFFACVLVPLLLMLGVYLRIFLAARRQLKQMESQPLPGERARSTLQKEVHAAKSLAIIVGLFALCWLPLHIINCFTFFCPDCSHAPLWLMYLAIVLSHTNSVVNPFIYAYRIREFRQTFRKIIRSHVLRQQEPFKAAGTSARVLAAHGSDGEQVSLRLNGHPPGVWANGSAPHPERRPNGYALGLVSGGSAQESQGNTGLPDVELLSHELKGVCPEPPGLDDPLAQDGAGVS0000000000";
 int aminoCounter = 0;
 char currentChar;
 
 HashMap<String, Integer> elementColors = new HashMap<String, Integer>();
+int aminoIndex = 50;
 
 color bucketColor;
 
@@ -51,26 +52,36 @@ void setup() {
   aminoColors.put("D", #154360);
   aminoColors.put("T", #1B4F72);
   aminoColors.put("U", #0E6251);
+  aminoColors.put("0", #000000);
 }
 
 void draw() {
-    
-  currentChar = adenosineReceptor.charAt(aminoCounter);
-  bucketColor = aminoColors.get(str(currentChar));
-    
-  setBucketColor(bucketRow, bucketCol, bucketColor);
+  String aminoChars = adenosineReceptor.substring(aminoIndex-50, aminoIndex);
+  //aminoChars = reverse(aminoChars);
+  //println(aminoChars);
+  //println(aminoChars.length());
+  String reversed = "";
+  int i = 49;
+  while(i >= 0){
+    println(i);
+    reversed += str(aminoChars.charAt(i));
+    //println(reversed);
+    --i;
+  }
+  println(reversed);
   
-  delay(15);
-  println("Bucket number :" + bucketNumber);
-  bucketRow++;
-  if(bucketRow == 5){  //completed sending to all 50 buckets
-    bucketRow = 0;
-    bucketCol++;
-    if(bucketCol == 10){
-      bucketCol = 0;
-      aminoCounter++;
+  for(int row = 0; row < 5; row++) {
+    for(int col = 0; col < 10; col++) {
+      currentChar = reversed.charAt((row*10)+col);
+      bucketColor = aminoColors.get(str(currentChar));
+      setBucketColor(row, col, bucketColor);
+      delay(15);
     }
   }
+  
+  delay(50);
+  aminoIndex++;
+  
   if(aminoCounter == adenosineReceptor.length()){
     aminoCounter = 0;
     //exit();
@@ -85,12 +96,12 @@ void setBucketColor(int bucketRow, int bucketCol, color bucketColor){
   bucketNumber = bucketCol + (bucketRow * 10);
   bucketUniqueAddress = bucketAddress[bucketNumber];
     
-  URL = common + bucketUniqueAddress + "/?" + "r=" + red(bucketColor) + "&g=" + green(bucketColor) + "&b=" + blue(bucketColor); 
-  
-  println(URL);
+  URL = common + bucketUniqueAddress + "/?" + "r=" + int(red(bucketColor)) + "&g=" + int(green(bucketColor)) + "&b=" + int(blue(bucketColor)); 
   
   tempURL = URL;
-  thread("sendGetRequest");
+  requestThread request = new requestThread(tempURL);
+  request.start();
+  //thread("sendGetRequest");
 }
 
 void sendGetRequest(){
@@ -100,5 +111,29 @@ void sendGetRequest(){
     get = null;
   } catch (Exception err) {
     // don't care lol
+  }
+}
+
+public class requestThread implements Runnable {
+  Thread thread;
+  String requesturl;
+  public requestThread(String url) { requesturl = url; }
+  public void start() {
+    thread = new Thread(this);
+    thread.start();
+  }
+  public void dispose() { stop(); }
+  public void stop() { thread = null; }
+  
+  public void run() {
+    println(requesturl);
+    try {
+      GetRequest get = new GetRequest(requesturl);
+      get.send();
+      get = null;
+    } catch (Exception err) {
+      // don't care lol
+    }
+    this.dispose();
   }
 }
