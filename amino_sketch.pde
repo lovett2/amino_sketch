@@ -19,6 +19,8 @@ String adenosineReceptor = "00000000000000000000000000000000000000000000000000GS
 
 //protein p53 is a tumor antogen (attacks tumors) - mutations mean tumors likely
 String pFiftyThree = "00000000000000000000000000000000000000000000000000MEEPQSDPSVEPPLSQETFSDLWKLLPENNVLSPLPSQAMDDLMLSPDDIEQWFTEDPGPDEAPRMPEAAPRVAPAPAAPTPAAPAPAPSWPLSSSVPSQKTYQGSYGFRLGFLHSGTAKSVTCTYSPALNKMFCQLAKTCPVQLWVDSTPPPGTRVRAMAIYKQSQHMTEVVRRCPHHERCSDSDGLAPPQHLIRVEGNLRVEYLDDRNTFRHSVVVPYEPPEVGSDCTTIHYNYMCNSSCMGGMNRRPILTIITLEDSSGNLLGRNSFEVHVCACPGRDRRTEEENLRKKGEPHHELPPGSTKRALSNNTSSSPQPKKKPLDGEYFTLQIRGRERFEMFRELNEALELKDAQAGKEPGGSRAHSSHLKSKKGQSTSRHKKLMFKTEGPDSD00000000000000000000000000000000000000000000000000";
+
+String currentProtein;
 int aminoCounter = 0;
 char currentChar;
 
@@ -69,11 +71,12 @@ void setup() {
   
   //blank
   aminoColors.put("0", #000000);
+  
+  currentProtein = pFiftyThree;
 }
 
 void draw() {
-  String aminoChars = pFiftyThree.substring(aminoIndex - 14, aminoIndex);
-  //String aminoChars = adenosineReceptors.substring(aminoIndex - 14, aminoIndex);
+  String aminoChars = currentProtein.substring(aminoIndex - 14, aminoIndex);
   
   String reversed = "";
   int i = aminoChars.length()-1;
@@ -103,9 +106,14 @@ void draw() {
   delay(20);
   aminoIndex++;
   
-  if(aminoCounter == pFiftyThree.length()){
+  if(aminoCounter == currentProtein.length()){
     aminoCounter = 0;
-    //exit();
+    if(currentProtein == pFiftyThree){
+      currentProtein = adenosineReceptor;
+    }
+    else{
+      currentProtein = pFiftyThree;
+    }
   }
 }
 
