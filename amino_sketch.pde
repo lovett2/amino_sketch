@@ -72,6 +72,7 @@ void setup() {
 }
 
 void draw() {
+  ArrayList<requestThread> threads = new ArrayList<requestThread>();
   String aminoChars = pFiftyThree.substring(aminoIndex - 14, aminoIndex);
   //String aminoChars = adenosineReceptors.substring(aminoIndex - 14, aminoIndex);
   
@@ -96,8 +97,13 @@ void draw() {
         currentChar = reversed.charAt(col + 2);
       }
       bucketColor = aminoColors.get(str(currentChar));
-      setBucketColor(row, col, bucketColor);   
+      threads.add(buildUpdateRequest(row, col, bucketColor));
     }
+  }
+
+  for (int x = 0; x < threads.size(); x++) {
+    requestThread request = threads.get(x);
+    request.start();
   }
   
   delay(20);
@@ -110,8 +116,7 @@ void draw() {
 }
 
   //send get post
-void setBucketColor(int bucketRow, int bucketCol, color bucketColor){
-  delay(10);
+requestThread buildUpdateRequest(int bucketRow, int bucketCol, color bucketColor){
   fill(bucketColor);
   rect(bucketCol * 10, bucketRow * 10, 10, 10);
   
@@ -122,8 +127,7 @@ void setBucketColor(int bucketRow, int bucketCol, color bucketColor){
   
   tempURL = URL;
   requestThread request = new requestThread(tempURL);
-  request.start();
-  //thread("sendGetRequest");
+  return request;
 }
 
 void sendGetRequest(){
