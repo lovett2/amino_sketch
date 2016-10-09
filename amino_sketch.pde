@@ -11,9 +11,14 @@ String tempURL;
 String URL;
 int bucketUniqueAddress;
 
-//variables involving amino acid sequence
+//HashMap of amino acids to colors
 HashMap<String, Integer> aminoColors = new HashMap<String, Integer>();
+
+//protein receptor that is connected to sleepiness (blocked by caffeine)
 String adenosineReceptor = "00000000000000000000000000000000000000000000000000GSSVYITVELAIAVLAILGNVLVCWAVWLNSNLQNVTNYFVVSLAAADIAVGVLAIPFAITISTGFCAACHGCLFIACFVLVLTQSSIFSLLAIAIDRYIAIRIPLRYNGLVTGTRAKGIIAICWVLSFAIGLTPMLGWNNCGQPKEGKNHSQGCGEGQVACLFEDVVPMNYMVYFNFFACVLVPLLLMLGVYLRIFLAARRQLKQMESQPLPGERARSTLQKEVHAAKSLAIIVGLFALCWLPLHIINCFTFFCPDCSHAPLWLMYLAIVLSHTNSVVNPFIYAYRIREFRQTFRKIIRSHVLRQQEPFKAAGTSARVLAAHGSDGEQVSLRLNGHPPGVWANGSAPHPERRPNGYALGLVSGGSAQESQGNTGLPDVELLSHELKGVCPEPPGLDDPLAQDGAGVSMGSSVYITVELAIAVLAILGNVLVCWAVWLNSNLQNVTNYFVVSLAAADIAVGVLAIPFAITISTGFCAACHGCLFIACFVLVLTQSSIFSLLAIAIDRYIAIRIPLRYNGLVTGTRAKGIIAICWVLSFAIGLTPMLGWNNCGQPKEGKNHSQGCGEGQVACLFEDVVPMNYMVYFNFFACVLVPLLLMLGVYLRIFLAARRQLKQMESQPLPGERARSTLQKEVHAAKSLAIIVGLFALCWLPLHIINCFTFFCPDCSHAPLWLMYLAIVLSHTNSVVNPFIYAYRIREFRQTFRKIIRSHVLRQQEPFKAAGTSARVLAAHGSDGEQVSLRLNGHPPGVWANGSAPHPERRPNGYALGLVSGGSAQESQGNTGLPDVELLSHELKGVCPEPPGLDDPLAQDGAGVS0000000000";
+
+//protein p53 is a tumor antogen (attacks tumors) - mutations mean tumors likely
+String pFiftyThree = "00000000000000000000000000000000000000000000000000MEEPQSDPSVEPPLSQETFSDLWKLLPENNVLSPLPSQAMDDLMLSPDDIEQWFTEDPGPDEAPRMPEAAPRVAPAPAAPTPAAPAPAPSWPLSSSVPSQKTYQGSYGFRLGFLHSGTAKSVTCTYSPALNKMFCQLAKTCPVQLWVDSTPPPGTRVRAMAIYKQSQHMTEVVRRCPHHERCSDSDGLAPPQHLIRVEGNLRVEYLDDRNTFRHSVVVPYEPPEVGSDCTTIHYNYMCNSSCMGGMNRRPILTIITLEDSSGNLLGRNSFEVHVCACPGRDRRTEEENLRKKGEPHHELPPGSTKRALSNNTSSSPQPKKKPLDGEYFTLQIRGRERFEMFRELNEALELKDAQAGKEPGGSRAHSSHLKSKKGQSTSRHKKLMFKTEGPDSD00000000000000000000000000000000000000000000000000";
 int aminoCounter = 0;
 char currentChar;
 
@@ -31,37 +36,47 @@ void setup() {
     j++;
   }
   
-  aminoColors.put("G", #A93226);
-  aminoColors.put("A", #CB4335);
-  aminoColors.put("L", #884EA0);
-  aminoColors.put("M", #7D3C98);
-  aminoColors.put("F", #2471A3);
-  aminoColors.put("W", #2E86C1);
-  aminoColors.put("K", #17A589);
-  aminoColors.put("Q", #138D75);
-  aminoColors.put("E", #229954);
-  aminoColors.put("S", #28B463);
-  aminoColors.put("P", #D4AC0D);
-  aminoColors.put("V", #D68910);
-  aminoColors.put("I", #CA6F1E);
-  aminoColors.put("C", #BA4A00);
-  aminoColors.put("Y", #641E16);
-  aminoColors.put("H", #78281F);
-  aminoColors.put("R", #512E5F);
-  aminoColors.put("N", #4A235A);
-  aminoColors.put("D", #154360);
-  aminoColors.put("T", #1B4F72);
-  aminoColors.put("U", #0E6251);
+  //nonpolar letters - shades of blue
+  aminoColors.put("G", #0092c7);
+  aminoColors.put("A", #0077c7);
+  aminoColors.put("V", #005ac7);
+  aminoColors.put("I", #0035c7);
+  aminoColors.put("L", #0007c7);
+  aminoColors.put("M", #4900c7);
+  
+  //polar uncharged letters - shades of orange
+  aminoColors.put("S", #c75300); 
+  aminoColors.put("T", #c76300); 
+  aminoColors.put("C", #c77700); 
+  aminoColors.put("P", #c78b00); 
+  aminoColors.put("Q", #c79500);
+  
+  //positively charged - shades of red
+  aminoColors.put("K", #ff008c);
+  aminoColors.put("H", #ff0062);
+  aminoColors.put("N", #ff002f);
+  aminoColors.put("R", #ff0004);
+  
+  //negatively charged - green
+  aminoColors.put("E", #5ac700);
+  aminoColors.put("D", #00ff59);
+  
+  //aromatic - shades of yellow
+  aminoColors.put("W", #ffbf00);
+  aminoColors.put("F", #ffd900);
+  aminoColors.put("Y", #0d9e00);
+  aminoColors.put("U", #00bd5e);
+  
+  //blank
   aminoColors.put("0", #000000);
 }
 
 void draw() {
-  String aminoChars = adenosineReceptor.substring(aminoIndex-50, aminoIndex);
-  //aminoChars = reverse(aminoChars);
-  //println(aminoChars);
-  //println(aminoChars.length());
+  String aminoChars = pFiftyThree.substring(aminoIndex - 14, aminoIndex);
+  //String aminoChars = adenosineReceptors.substring(aminoIndex - 14, aminoIndex);
+  
   String reversed = "";
-  int i = 49;
+  int i = aminoChars.length()-1;
   while(i >= 0){
     println(i);
     reversed += str(aminoChars.charAt(i));
@@ -69,20 +84,26 @@ void draw() {
     --i;
   }
   println(reversed);
-  
-  for(int row = 0; row < 5; row++) {
-    for(int col = 0; col < 10; col++) {
-      currentChar = reversed.charAt((row*10)+col);
+  int[] rows = {2,3,1,4,0};
+  for(int col = 9; col >= 0; col--) {
+    for(int rowi = 4; rowi >= 0; rowi--) {
+      int row = rows[rowi];
+      if(row == 2) {
+        currentChar = reversed.charAt(col);
+      } else if (row == 1 || row == 3) {
+        currentChar = reversed.charAt(col + 1);
+      } else {
+        currentChar = reversed.charAt(col + 2);
+      }
       bucketColor = aminoColors.get(str(currentChar));
-      setBucketColor(row, col, bucketColor);
-      delay(15);
+      setBucketColor(row, col, bucketColor);   
     }
   }
   
-  delay(50);
+  delay(20);
   aminoIndex++;
   
-  if(aminoCounter == adenosineReceptor.length()){
+  if(aminoCounter == pFiftyThree.length()){
     aminoCounter = 0;
     //exit();
   }
@@ -90,6 +111,7 @@ void draw() {
 
   //send get post
 void setBucketColor(int bucketRow, int bucketCol, color bucketColor){
+  delay(10);
   fill(bucketColor);
   rect(bucketCol * 10, bucketRow * 10, 10, 10);
   
