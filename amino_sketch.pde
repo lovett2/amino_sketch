@@ -78,8 +78,7 @@ void setup() {
 void draw() {
 
   ArrayList<requestThread> threads = new ArrayList<requestThread>();
-  String aminoChars = pFiftyThree.substring(aminoIndex - 14, aminoIndex);
-  //String aminoChars = adenosineReceptors.substring(aminoIndex - 14, aminoIndex);
+  String aminoChars = currentProtein.substring(aminoIndex - 14, aminoIndex);
   
   String reversed = "";
   int i = aminoChars.length()-1;
